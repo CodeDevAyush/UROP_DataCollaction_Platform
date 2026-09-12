@@ -13,11 +13,10 @@ interface ProtectedTextareaProps {
   label: string;
   placeholder?: string;
   fieldProps: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-  wordCount: number;
   characterCount: number;
   elapsedSeconds: number;
-  minimumWords?: number;
-  maximumWords?: number;
+  minimumCharacters?: number;
+  maximumCharacters?: number;
   rows?: number;
   allowClipboard?: boolean;
 }
@@ -27,15 +26,14 @@ export function ProtectedTextarea({
   label,
   placeholder,
   fieldProps,
-  wordCount,
   characterCount,
   elapsedSeconds,
-  minimumWords,
-  maximumWords,
+  minimumCharacters,
+  maximumCharacters,
   rows = 10,
   allowClipboard = false,
 }: ProtectedTextareaProps) {
-  const belowMinimum = typeof minimumWords === "number" && wordCount < minimumWords;
+  const belowMinimum = typeof minimumCharacters === "number" && characterCount < minimumCharacters;
 
   return (
     <div className="space-y-2">
@@ -52,12 +50,16 @@ export function ProtectedTextarea({
       />
       <div id={`${id}-counters`} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
         <span aria-live="polite">
-          Word count: <strong className={belowMinimum ? "text-amber-700" : "text-slate-700"}>{wordCount}</strong>
-          {typeof minimumWords === "number" && minimumWords > 0 && (
-            <span> (minimum {minimumWords}{maximumWords ? `, recommended up to ${maximumWords}` : ""})</span>
+          Character count:{" "}
+          <strong className={belowMinimum ? "text-amber-700" : "text-slate-700"}>{characterCount}</strong>
+          {typeof minimumCharacters === "number" && minimumCharacters > 0 && (
+            <span>
+              {" "}
+              (minimum {minimumCharacters}
+              {maximumCharacters ? `, recommended up to ${maximumCharacters}` : ""})
+            </span>
           )}
         </span>
-        <span>Character count: {characterCount}</span>
         <span>Elapsed time: {formatElapsed(elapsedSeconds)}</span>
         {!allowClipboard && <span className="text-slate-400">Paste, cut, and drag-and-drop are disabled in this field.</span>}
       </div>

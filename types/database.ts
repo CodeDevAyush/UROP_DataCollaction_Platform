@@ -61,8 +61,8 @@ export interface Task {
   title: string;
   scenario: string;
   instructions: string;
-  minimum_words: number;
-  maximum_words: number | null;
+  minimum_characters: number;
+  maximum_characters: number | null;
   minimum_duration_seconds: number | null;
   maximum_duration_seconds: number | null;
   randomization_group: string | null;

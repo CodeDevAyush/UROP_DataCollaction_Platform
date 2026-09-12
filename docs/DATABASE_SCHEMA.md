@@ -1,8 +1,9 @@
 # Database Schema
 
-Source of truth: [`supabase/migrations/20260101000000_initial_schema.sql`](../supabase/migrations/20260101000000_initial_schema.sql).
-This document is a guided tour of it, not a duplicate — if the two disagree,
-the migration wins.
+Source of truth: [`supabase/migrations/`](../supabase/migrations/) (initial
+schema, plus any later migrations such as the switch from word- to
+character-based task limits). This document is a guided tour, not a
+duplicate — if the two disagree, the migrations win.
 
 ## Design principles
 
@@ -48,8 +49,8 @@ One attempt at the study flow. `status` is `in_progress` | `completed` |
 
 ### `tasks`
 The researcher-managed question bank. One row per stimulus (`condition` is
-`formal` | `casual` | `ai`). `minimum_words`/`maximum_words` and
-`minimum_duration_seconds`/`maximum_duration_seconds` are enforced (word
+`formal` | `casual` | `ai`). `minimum_characters`/`maximum_characters` and
+`minimum_duration_seconds`/`maximum_duration_seconds` are enforced (character
 count server-side; duration is currently informational/display-only) per
 task. `active` toggles visibility without deleting history.
 

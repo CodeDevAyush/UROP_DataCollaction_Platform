@@ -18,9 +18,15 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   }
 
   // Never trust client-supplied counts for validation — recompute server-side.
+  // Word count is still computed and stored below for future linguistic
+  // analysis, but character count is what's shown to participants and gates
+  // submission.
   const metrics = computeTextMetrics(body.text);
-  if (metrics.wordCount < task.minimum_words) {
-    return jsonError(`Response must be at least ${task.minimum_words} words (currently ${metrics.wordCount}).`, 422);
+  if (metrics.characterCount < task.minimum_characters) {
+    return jsonError(
+      `Response must be at least ${task.minimum_characters} characters (currently ${metrics.characterCount}).`,
+      422
+    );
   }
 
   const integrityFlag = computeIntegrityFlag({

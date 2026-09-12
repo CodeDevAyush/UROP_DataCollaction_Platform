@@ -53,7 +53,6 @@ function SelectField({
         onChange={(e) => onChange(e.target.value)}
         className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400"
       >
-        <option value="">Prefer not to say</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -99,13 +98,13 @@ function CheckboxGroup({
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [academicYear, setAcademicYear] = useState("");
+  const [academicYear, setAcademicYear] = useState(ACADEMIC_YEARS[0]);
   const [program, setProgram] = useState("");
   const [branch, setBranch] = useState("");
-  const [ageGroup, setAgeGroup] = useState("");
+  const [ageGroup, setAgeGroup] = useState(AGE_GROUPS[0]);
   const [primaryLanguage, setPrimaryLanguage] = useState("");
   const [otherLanguages, setOtherLanguages] = useState("");
-  const [aiUsageFrequency, setAiUsageFrequency] = useState("");
+  const [aiUsageFrequency, setAiUsageFrequency] = useState(AI_FREQUENCIES[0]);
   const [aiToolsUsed, setAiToolsUsed] = useState<string[]>([]);
   const [aiPrimaryUse, setAiPrimaryUse] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -152,15 +151,15 @@ export default function ProfilePage() {
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <SelectField label="Academic year" value={academicYear} onChange={setAcademicYear} options={ACADEMIC_YEARS} />
-        <TextField label="Program" value={program} onChange={setProgram} placeholder="e.g. B.Tech CSE" />
-        <TextField label="Branch / department" value={branch} onChange={setBranch} placeholder="e.g. Computer Science" />
+        <TextField label="Program" value={program} onChange={setProgram} placeholder="e.g. BTech" />
+        <TextField label="Branch / department" value={branch} onChange={setBranch} placeholder="e.g. CSE" />
         <SelectField label="Age group" value={ageGroup} onChange={setAgeGroup} options={AGE_GROUPS} />
-        <TextField label="Primary / native language" value={primaryLanguage} onChange={setPrimaryLanguage} placeholder="e.g. Tamil" />
+        <TextField label="Primary / native language" value={primaryLanguage} onChange={setPrimaryLanguage} placeholder="e.g. Hindi" />
         <TextField
           label="Other languages you use regularly"
           value={otherLanguages}
           onChange={setOtherLanguages}
-          placeholder="Comma-separated, e.g. English, Hindi"
+          placeholder="Comma-separated, e.g. English, Tamil"
         />
         <SelectField label="How often do you use generative-AI tools?" value={aiUsageFrequency} onChange={setAiUsageFrequency} options={AI_FREQUENCIES} />
       </div>

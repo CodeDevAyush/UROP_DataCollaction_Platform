@@ -21,8 +21,11 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   }
 
   const metrics = computeTextMetrics(body.studentPrompt);
-  if (metrics.wordCount < task.minimum_words) {
-    return jsonError(`Your instructions must be at least ${task.minimum_words} words (currently ${metrics.wordCount}).`, 422);
+  if (metrics.characterCount < task.minimum_characters) {
+    return jsonError(
+      `Your instructions must be at least ${task.minimum_characters} characters (currently ${metrics.characterCount}).`,
+      422
+    );
   }
 
   const standardizedTask = buildStandardizedTask(task);

@@ -12,8 +12,8 @@ interface AiTask {
   title: string;
   scenario: string;
   instructions: string;
-  minimumWords: number;
-  maximumWords: number | null;
+  minimumCharacters: number;
+  maximumCharacters: number | null;
 }
 
 interface StudyConfig {
@@ -39,15 +39,14 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [draftLoaded, setDraftLoaded] = useState(false);
 
   const step = `ai_prompt:${task.id}`;
   useAutosave(step, promptField.text);
 
+  // Non-blocking draft restore — see the identical comment in study/formal.
   useEffect(() => {
     fetchDraft(step).then((draft) => {
       if (draft) promptField.setText(draft);
-      setDraftLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
@@ -57,7 +56,7 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
   const editedField = useProtectedTextField({ allowClipboard: true });
   const [modelName, setModelName] = useState("");
 
-  const belowMinimum = promptField.wordCount < task.minimumWords;
+  const belowMinimum = promptField.characterCount < task.minimumCharacters;
 
   async function submitPrompt() {
     setSubmitting(true);
@@ -126,8 +125,6 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
     }
   }
 
-  if (!draftLoaded) return <LoadingState />;
-
   if (stage === "prompt") {
     return (
       <>
@@ -172,11 +169,10 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
             id="ai-prompt"
             label="Your instructions to the AI"
             fieldProps={promptField.fieldProps}
-            wordCount={promptField.wordCount}
             characterCount={promptField.characterCount}
             elapsedSeconds={promptField.elapsedSeconds}
-            minimumWords={task.minimumWords}
-            maximumWords={task.maximumWords ?? undefined}
+            minimumCharacters={task.minimumCharacters}
+            maximumCharacters={task.maximumCharacters ?? undefined}
             rows={8}
           />
         </div>
@@ -184,7 +180,7 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
         <ErrorAlert message={error} />
         {belowMinimum && (
           <p className="mt-2 text-sm text-amber-700">
-            Write at least {task.minimumWords} words ({promptField.wordCount} so far).
+            Write at least {task.minimumCharacters} characters ({promptField.characterCount} so far).
           </p>
         )}
 
@@ -244,7 +240,6 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
           id="ai-output"
           label="AI-generated response"
           fieldProps={outputField.fieldProps}
-          wordCount={outputField.wordCount}
           characterCount={outputField.characterCount}
           elapsedSeconds={outputField.elapsedSeconds}
           rows={10}
@@ -281,7 +276,6 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
             id="ai-edited-output"
             label="Paste your final edited version"
             fieldProps={editedField.fieldProps}
-            wordCount={editedField.wordCount}
             characterCount={editedField.characterCount}
             elapsedSeconds={editedField.elapsedSeconds}
             rows={10}

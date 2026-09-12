@@ -27,15 +27,16 @@ function CasualScenarioForm({
   const [independent, setIndependent] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [draftLoaded, setDraftLoaded] = useState(false);
 
   const step = `casual:${task.id}`;
   useAutosave(step, field.text);
 
+  // Non-blocking draft restore — see the identical comment in study/formal.
+  // This used to gate the whole form behind a network round-trip on every
+  // scenario, which is what made each "Next situation" click feel slow.
   useEffect(() => {
     fetchDraft(step).then((draft) => {
       if (draft) field.setText(draft);
-      setDraftLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
@@ -68,8 +69,6 @@ function CasualScenarioForm({
     }
   }
 
-  if (!draftLoaded) return <LoadingState />;
-
   return (
     <>
       <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -93,7 +92,7 @@ function CasualScenarioForm({
           {...field.fieldProps}
         />
         <div className="mt-1 flex justify-between text-xs text-slate-500">
-          <span>Words: {field.wordCount}</span>
+          <span>Characters: {field.characterCount}</span>
           <span>Paste disabled — type your natural reply.</span>
         </div>
       </div>

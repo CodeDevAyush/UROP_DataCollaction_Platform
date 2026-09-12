@@ -126,9 +126,9 @@ const aiTasks = [
     title: "Mandatory Attendance Policy",
     scenario: formalTasks[0].scenario,
     instructions:
-      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite the instructions in your own natural words. You may specify what the AI should focus on, how it should organize the response, what tone or language it should use, what arguments it should include, how detailed it should be, or any other requirements you consider useful.\n\nDo not copy a prompt from another person or an existing source. Write approximately 100–200 words. Use your natural communication style. You may use English, Hindi, Tamil, Hinglish, Tanglish, abbreviations, informal language, or code-mixing if that is how you naturally communicate with AI tools. Do not intentionally add language mixing merely for the study.",
-    minimum_words: 100,
-    maximum_words: 200,
+      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite the instructions in your own natural words. You may specify what the AI should focus on, how it should organize the response, what tone or language it should use, what arguments it should include, how detailed it should be, or any other requirements you consider useful.\n\nDo not copy a prompt from another person or an existing source. Write approximately 500–1000 characters. Use your natural communication style. You may use English, Hindi, Tamil, Hinglish, Tanglish, abbreviations, informal language, or code-mixing if that is how you naturally communicate with AI tools. Do not intentionally add language mixing merely for the study.",
+    minimum_characters: 500,
+    maximum_characters: 1000,
     display_order: 1,
   },
   {
@@ -136,9 +136,9 @@ const aiTasks = [
     title: "University Assessment Reform",
     scenario: formalTasks[2].scenario,
     instructions:
-      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 100–200 words, in your own natural style. Do not copy a prompt from another person or an existing source.",
-    minimum_words: 100,
-    maximum_words: 200,
+      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 500–1000 characters, in your own natural style. Do not copy a prompt from another person or an existing source.",
+    minimum_characters: 500,
+    maximum_characters: 1000,
     display_order: 2,
   },
   {
@@ -146,9 +146,9 @@ const aiTasks = [
     title: "Student Use of Personal Technology",
     scenario: formalTasks[4].scenario,
     instructions:
-      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 100–200 words, in your own natural style. Do not copy a prompt from another person or an existing source.",
-    minimum_words: 100,
-    maximum_words: 200,
+      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 500–1000 characters, in your own natural style. Do not copy a prompt from another person or an existing source.",
+    minimum_characters: 500,
+    maximum_characters: 1000,
     display_order: 3,
   },
   {
@@ -158,9 +158,9 @@ const aiTasks = [
 
 The committee has asked students to submit their view on whether such a workshop should be introduced, and if so, in what form.`,
     instructions:
-      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 100–200 words, in your own natural style. Do not copy a prompt from another person or an existing source.",
-    minimum_words: 100,
-    maximum_words: 200,
+      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 500–1000 characters, in your own natural style. Do not copy a prompt from another person or an existing source.",
+    minimum_characters: 500,
+    maximum_characters: 1000,
     display_order: 4,
   },
   {
@@ -168,9 +168,9 @@ The committee has asked students to submit their view on whether such a workshop
     title: "Balancing Academics and Extracurriculars",
     scenario: `The student affairs office is drafting guidance for first-year students on balancing coursework with clubs, sports, and social activities, after noticing many students struggle with time management in their first semester. They have asked current students to contribute perspective on how much emphasis this guidance should place on academics versus extracurricular involvement, and what practical advice it should include.`,
     instructions:
-      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 100–200 words, in your own natural style. Do not copy a prompt from another person or an existing source.",
-    minimum_words: 100,
-    maximum_words: 200,
+      "Read the situation carefully. Instead of answering the situation yourself, write the instructions you would normally give to a generative-AI tool to help you prepare the response.\n\nWrite approximately 500–1000 characters, in your own natural style. Do not copy a prompt from another person or an existing source.",
+    minimum_characters: 500,
+    maximum_characters: 1000,
     display_order: 5,
   },
 ];
@@ -197,8 +197,8 @@ async function main() {
         title: t.title,
         scenario: t.scenario,
         instructions: t.instructions,
-        minimum_words: 150,
-        maximum_words: 300,
+        minimum_characters: 150,
+        maximum_characters: 2000,
         display_order: t.display_order,
         active: true,
       },
@@ -218,8 +218,8 @@ async function main() {
         scenario: t.scenario,
         instructions:
           "Respond exactly as you normally would communicate with a friend. Use whatever language, expressions, abbreviations, slang, emojis, or punctuation you would naturally use.",
-        minimum_words: 0,
-        maximum_words: null,
+        minimum_characters: 0,
+        maximum_characters: null,
         display_order: t.display_order,
         active: true,
       },
@@ -238,8 +238,8 @@ async function main() {
         title: t.title,
         scenario: t.scenario,
         instructions: t.instructions,
-        minimum_words: t.minimum_words,
-        maximum_words: t.maximum_words,
+        minimum_characters: t.minimum_characters,
+        maximum_characters: t.maximum_characters,
         display_order: t.display_order,
         active: true,
       },

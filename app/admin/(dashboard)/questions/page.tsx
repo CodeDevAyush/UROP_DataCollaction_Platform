@@ -11,8 +11,8 @@ interface TaskRow {
   title: string;
   scenario: string;
   instructions: string;
-  minimum_words: number;
-  maximum_words: number | null;
+  minimum_characters: number;
+  maximum_characters: number | null;
   display_order: number;
   active: boolean;
 }
@@ -24,8 +24,8 @@ const EMPTY_FORM = {
   title: "",
   scenario: "",
   instructions: "",
-  minimumWords: 150,
-  maximumWords: 300 as number | null,
+  minimumCharacters: 150,
+  maximumCharacters: 2000 as number | null,
   displayOrder: 0,
 };
 
@@ -137,20 +137,22 @@ export default function QuestionsPage() {
               />
             </label>
             <label className="text-sm">
-              Minimum words
+              Minimum characters
               <input
                 type="number"
-                value={form.minimumWords}
-                onChange={(e) => setForm({ ...form, minimumWords: Number(e.target.value) })}
+                value={form.minimumCharacters}
+                onChange={(e) => setForm({ ...form, minimumCharacters: Number(e.target.value) })}
                 className="mt-1 w-full rounded-md border border-slate-300 p-2"
               />
             </label>
             <label className="text-sm">
-              Maximum words (optional)
+              Maximum characters (optional)
               <input
                 type="number"
-                value={form.maximumWords ?? ""}
-                onChange={(e) => setForm({ ...form, maximumWords: e.target.value ? Number(e.target.value) : null })}
+                value={form.maximumCharacters ?? ""}
+                onChange={(e) =>
+                  setForm({ ...form, maximumCharacters: e.target.value ? Number(e.target.value) : null })
+                }
                 className="mt-1 w-full rounded-md border border-slate-300 p-2"
               />
             </label>
@@ -178,8 +180,8 @@ export default function QuestionsPage() {
                           {t.title} <span className="font-mono text-xs text-slate-400">({t.task_code})</span>
                         </p>
                         <p className="text-xs text-slate-500">
-                          Phase: {t.study_phase} · min words: {t.minimum_words}
-                          {t.maximum_words ? ` · max: ${t.maximum_words}` : ""}
+                          Phase: {t.study_phase} · min characters: {t.minimum_characters}
+                          {t.maximum_characters ? ` · max: ${t.maximum_characters}` : ""}
                         </p>
                       </div>
                       <button

@@ -9,8 +9,8 @@ const updateSchema = z.object({
   title: z.string().min(1).max(300).optional(),
   scenario: z.string().min(1).max(10000).optional(),
   instructions: z.string().max(5000).optional(),
-  minimumWords: z.number().int().min(0).optional(),
-  maximumWords: z.number().int().min(0).nullable().optional(),
+  minimumCharacters: z.number().int().min(0).optional(),
+  maximumCharacters: z.number().int().min(0).nullable().optional(),
   minimumDurationSeconds: z.number().int().min(0).nullable().optional(),
   maximumDurationSeconds: z.number().int().min(0).nullable().optional(),
   randomizationGroup: z.string().max(100).nullable().optional(),
@@ -29,8 +29,8 @@ export const PATCH = withApiErrorHandling(async (req: Request, ctx: { params: Pr
   if (body.title !== undefined) update.title = body.title;
   if (body.scenario !== undefined) update.scenario = body.scenario;
   if (body.instructions !== undefined) update.instructions = body.instructions;
-  if (body.minimumWords !== undefined) update.minimum_words = body.minimumWords;
-  if (body.maximumWords !== undefined) update.maximum_words = body.maximumWords;
+  if (body.minimumCharacters !== undefined) update.minimum_characters = body.minimumCharacters;
+  if (body.maximumCharacters !== undefined) update.maximum_characters = body.maximumCharacters;
   if (body.minimumDurationSeconds !== undefined) update.minimum_duration_seconds = body.minimumDurationSeconds;
   if (body.maximumDurationSeconds !== undefined) update.maximum_duration_seconds = body.maximumDurationSeconds;
   if (body.randomizationGroup !== undefined) update.randomization_group = body.randomizationGroup;

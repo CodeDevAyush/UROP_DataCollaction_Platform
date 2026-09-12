@@ -12,8 +12,8 @@ interface FormalTask {
   title: string;
   scenario: string;
   instructions: string;
-  minimumWords: number;
-  maximumWords: number | null;
+  minimumCharacters: number;
+  maximumCharacters: number | null;
 }
 
 type Attestation = "independent" | "assisted";
@@ -24,20 +24,22 @@ function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void
   const [assistedNote, setAssistedNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [draftLoaded, setDraftLoaded] = useState(false);
 
   const step = `formal:${task.id}`;
   useAutosave(step, field.text);
 
+  // Restore an autosaved draft in the background — the form renders
+  // immediately either way, so a rare draft (from an interrupted earlier
+  // visit) just fades in rather than blocking every task with a network
+  // round-trip.
   useEffect(() => {
     fetchDraft(step).then((draft) => {
       if (draft) field.setText(draft);
-      setDraftLoaded(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const belowMinimum = field.wordCount < task.minimumWords;
+  const belowMinimum = field.characterCount < task.minimumCharacters;
   const canSubmit = !belowMinimum && (attestation === "independent" || assistedNote.trim().length > 0);
 
   async function handleSubmit() {
@@ -68,8 +70,6 @@ function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void
     }
   }
 
-  if (!draftLoaded) return <LoadingState />;
-
   return (
     <>
       <h2 className="text-xl font-semibold text-slate-900">{task.title}</h2>
@@ -83,11 +83,10 @@ function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void
           id="formal-response"
           label="Your response"
           fieldProps={field.fieldProps}
-          wordCount={field.wordCount}
           characterCount={field.characterCount}
           elapsedSeconds={field.elapsedSeconds}
-          minimumWords={task.minimumWords}
-          maximumWords={task.maximumWords ?? undefined}
+          minimumCharacters={task.minimumCharacters}
+          maximumCharacters={task.maximumCharacters ?? undefined}
           rows={14}
         />
       </div>
@@ -135,7 +134,8 @@ function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void
       <ErrorAlert message={error} />
       {belowMinimum && (
         <p className="mt-2 text-sm text-amber-700">
-          Please write at least {task.minimumWords} words before continuing ({field.wordCount} so far).
+          Please write at least {task.minimumCharacters} characters before continuing ({field.characterCount} so
+          far).
         </p>
       )}
 
