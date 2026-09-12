@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "AI-Tool Influence on Code-Switching — SRM Research Study",
   description:
     "Academic research data-collection platform for the UROP study on AI-tool influence on code-switching patterns among SRM students.",
+  // A study recruitment tool and admin login should never show up in search
+  // results — the HTTP-level X-Robots-Tag header (next.config.ts) covers
+  // every response including API routes; this covers crawlers that only
+  // read the HTML.
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -31,6 +31,50 @@ Protected by Supabase Auth; participants can never reach it.
 - **Supabase** (Postgres + Auth) — local dev via the Supabase CLI, hosted via a Supabase project
 - **Zod** for request validation, **Vitest** + Testing Library for tests
 
+## Project structure
+
+Next.js is a full-stack framework: the frontend and backend are deliberately
+**one deployable unit** (this is the standard, deployment-friendly pattern —
+Vercel or any Node host runs a single `next build` output, with no separate
+backend server, CORS setup, or second deploy pipeline to maintain). Within
+that one app, the three layers are still cleanly separated by folder:
+
+```
+UROP/
+├── app/                    # FRONTEND — pages, layouts, and only the API
+│   ├── study/              #   route handlers Next.js requires to live
+│   ├── admin/              #   alongside pages (app/api/**). Each route.ts
+│   └── api/                #   under app/api is a BACKEND endpoint.
+│
+├── components/             # FRONTEND — React components only
+│   ├── ui/                 #   generic primitives (Card, Button, Alert...)
+│   ├── study/               #   participant-flow specific
+│   └── admin/               #   admin-console specific
+│
+├── lib/                    # BACKEND — business logic, auth, validation
+│   ├── auth/                #   session + admin-auth checks
+│   ├── api/                 #   shared API error handling
+│   ├── study/                #   task assignment, consent, settings
+│   ├── supabase/             #   the ONLY place DB clients are constructed
+│   ├── utils/                #   pure helpers (word count, integrity flag, CSV)
+│   ├── hooks/                # FRONTEND — React hooks (paste-blocking, autosave)
+│   └── validation.ts, env.ts
+│
+├── supabase/migrations/    # DATABASE — schema, as versioned SQL
+├── types/database.ts       # DATABASE — row types shared by frontend & backend
+├── scripts/                 # one-off backend/DB scripts (seed, create-admin)
+├── tests/                  # unit tests
+├── docs/                   # setup, schema, data dictionary, deployment, ethics
+└── public/                 # FRONTEND — static assets
+```
+
+**Why `app/api/**` isn't a separate `backend/` folder:** the App Router
+discovers both pages and API routes by scanning `app/`; moving `api/`
+outside it isn't a supported Next.js configuration. The database boundary is
+already hard: no file outside `lib/supabase/` ever opens a Postgres
+connection or holds the service-role key — every other layer goes through
+`createSupabaseServiceClient()`/`createSupabaseServerClient()`.
+
 ## Quick start (local development)
 
 ```bash

@@ -1,9 +1,5 @@
 "use client";
 
-export function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8 ${className}`}>{children}</div>;
-}
-
 export function PrimaryButton({
   children,
   disabled,
@@ -35,23 +31,4 @@ export function SecondaryButton({ children, ...props }: React.ButtonHTMLAttribut
       {children}
     </button>
   );
-}
-
-export function ErrorAlert({ message }: { message: string | null }) {
-  if (!message) return null;
-  return (
-    <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-      {message}
-    </div>
-  );
-}
-
-export function InfoAlert({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">{children}</div>
-  );
-}
-
-export function LoadingState() {
-  return <p className="text-sm text-slate-500">Loading…</p>;
 }

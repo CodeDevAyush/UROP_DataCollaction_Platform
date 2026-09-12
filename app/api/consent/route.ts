@@ -6,12 +6,25 @@ import { generateParticipantCode, generateSessionCode } from "@/lib/utils/partic
 import { getCurrentSession, setSessionCookie } from "@/lib/auth/participant-session";
 import { getSetting, SETTING_KEYS } from "@/lib/study/settings";
 import { DEFAULT_CONSENT_TEXT, hashConsentText } from "@/lib/study/consent";
+import { checkRateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 const MAX_CODE_ATTEMPTS = 5;
+
+// This is the one unauthenticated endpoint that can create new database
+// rows (a new participant + session), so it's the main spam/abuse surface
+// on the participant side. See lib/api/rate-limit.ts for the limitation of
+// this approach on serverless hosting.
+const NEW_PARTICIPANT_LIMIT = 20;
+const NEW_PARTICIPANT_WINDOW_MS = 15 * 60 * 1000;
 
 export const POST = withApiErrorHandling(async (req: Request) => {
   const body = consentSchema.parse(await req.json());
   const supabase = createSupabaseServiceClient();
+
+  const rateLimit = checkRateLimit(`consent:${getClientIp(req)}`, NEW_PARTICIPANT_LIMIT, NEW_PARTICIPANT_WINDOW_MS);
+  if (!rateLimit.allowed) {
+    return jsonError("Too many requests. Please wait a few minutes and try again.", 429);
+  }
 
   // Resume an in-progress session (e.g. participant refreshed the consent
   // page) instead of minting a duplicate participant record.
