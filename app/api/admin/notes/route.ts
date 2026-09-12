@@ -3,12 +3,15 @@ import { z } from "zod";
 import { withApiErrorHandling, jsonError } from "@/lib/api/response";
 import { requireAdmin } from "@/lib/auth/admin-auth";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { setCasualReplyResearcherNote } from "@/lib/study/casual-responses";
 
 const ALLOWED_TABLES = ["writing_samples", "casual_responses", "ai_interactions"] as const;
 
 const bodySchema = z.object({
   table: z.enum(ALLOWED_TABLES),
-  id: z.string().uuid(),
+  // Most tables use a plain row UUID; casual_responses uses a compound
+  // "<row-uuid>:<task-uuid>" key since one row holds several replies.
+  id: z.string().min(1).max(80),
   note: z.string().max(4000),
 });
 
@@ -16,8 +19,14 @@ const bodySchema = z.object({
 export const POST = withApiErrorHandling(async (req: Request) => {
   await requireAdmin();
   const body = bodySchema.parse(await req.json());
-  const supabase = createSupabaseServiceClient();
 
+  if (body.table === "casual_responses") {
+    const ok = await setCasualReplyResearcherNote(body.id, body.note);
+    if (!ok) return jsonError("Could not save note.", 500);
+    return NextResponse.json({ ok: true });
+  }
+
+  const supabase = createSupabaseServiceClient();
   const { error } = await supabase
     .from(body.table)
     .update({ researcher_note: body.note } as never)

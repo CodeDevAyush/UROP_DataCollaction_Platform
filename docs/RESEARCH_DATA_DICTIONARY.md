@@ -47,12 +47,18 @@ All fields are optional (participants may decline any of them).
 
 ## casual_responses (Condition B — human casual)
 
-Same metadata shape as `writing_samples` (see above), one row per scenario.
+One row **per participant session**, not per scenario: the `replies` column
+is a JSON array holding every scenario reply for that participant together.
+Each element of that array has the same metadata shape as a `writing_samples`
+row (see above). Exports and the admin console flatten this back into one
+row per reply, so analysis code doesn't need to think about the nesting —
+only `lib/study/casual-responses.ts` does.
 
-| Field | Purpose | Type | PII | Required |
+| Field (per array element) | Purpose | Type | PII | Required |
 |---|---|---|---|---|
 | `raw_text` | The participant's reply to a simulated casual scenario, verbatim — expected to show natural code-switching, slang, emoji, abbreviations. This is the key data point for code-mixing analysis. | text | No | Yes |
 | `scenario_number` | Presentation order of this scenario for this participant. | integer | No | Yes |
+| `task_id` | Which scenario (from the question bank) this reply answers. | uuid | No | Yes |
 
 ## ai_interactions (Condition C — AI-mediated)
 

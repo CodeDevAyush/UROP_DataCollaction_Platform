@@ -5,6 +5,7 @@ import { requireCurrentSession } from "@/lib/auth/participant-session";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { computeTextMetrics } from "@/lib/utils/text-metrics";
 import { computeIntegrityFlag } from "@/lib/utils/integrity";
+import { appendCasualReply, ScenarioAlreadySubmittedError } from "@/lib/study/casual-responses";
 import type { Task } from "@/types/database";
 
 export const POST = withApiErrorHandling(async (req: Request) => {
@@ -18,36 +19,47 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   }
 
   const metrics = computeTextMetrics(body.text);
+  if (metrics.characterCount < task.minimum_characters) {
+    return jsonError(
+      `Reply must be at least ${task.minimum_characters} characters (currently ${metrics.characterCount}).`,
+      422
+    );
+  }
+
   const integrityFlag = computeIntegrityFlag({
     pasteAttempts: body.metadata.pasteAttempts,
     cutAttempts: body.metadata.cutAttempts,
     dropAttempts: body.metadata.dropAttempts,
   });
 
-  const { error } = await supabase.from("casual_responses").insert({
-    participant_id: session.participant_id,
-    session_id: session.id,
-    task_id: task.id,
-    scenario_number: body.scenarioNumber,
-    study_phase: session.study_phase,
-    raw_text: body.text,
-    word_count: metrics.wordCount,
-    character_count: metrics.characterCount,
-    started_at: body.metadata.startedAt,
-    duration_seconds: body.metadata.durationSeconds,
-    keystroke_count: body.metadata.keystrokeCount,
-    backspace_count: body.metadata.backspaceCount,
-    paste_attempts: body.metadata.pasteAttempts,
-    cut_attempts: body.metadata.cutAttempts,
-    drop_attempts: body.metadata.dropAttempts,
-    focus_loss_count: body.metadata.focusLossCount,
-    independent_writing_confirmed: body.attestation.type === "independent",
-    integrity_flag: integrityFlag,
-  } as never);
-
-  if (error) {
-    if (error.code === "23505") {
-      return jsonError("A reply for this scenario has already been submitted.", 409);
+  try {
+    await appendCasualReply({
+      participantId: session.participant_id,
+      sessionId: session.id,
+      studyPhase: session.study_phase,
+      reply: {
+        task_id: task.id,
+        scenario_number: body.scenarioNumber,
+        raw_text: body.text,
+        word_count: metrics.wordCount,
+        character_count: metrics.characterCount,
+        started_at: body.metadata.startedAt,
+        submitted_at: new Date().toISOString(),
+        duration_seconds: body.metadata.durationSeconds,
+        keystroke_count: body.metadata.keystrokeCount,
+        backspace_count: body.metadata.backspaceCount,
+        paste_attempts: body.metadata.pasteAttempts,
+        cut_attempts: body.metadata.cutAttempts,
+        drop_attempts: body.metadata.dropAttempts,
+        focus_loss_count: body.metadata.focusLossCount,
+        independent_writing_confirmed: body.attestation.type === "independent",
+        integrity_flag: integrityFlag,
+        researcher_note: null,
+      },
+    });
+  } catch (err) {
+    if (err instanceof ScenarioAlreadySubmittedError) {
+      return jsonError(err.message, 409);
     }
     return jsonError("Could not save your reply.", 500);
   }

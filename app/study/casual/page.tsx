@@ -10,6 +10,8 @@ interface CasualTask {
   id: string;
   title: string;
   scenario: string;
+  minimumCharacters: number;
+  maximumCharacters: number | null;
 }
 
 function CasualScenarioForm({
@@ -41,8 +43,10 @@ function CasualScenarioForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
+  const belowMinimum = field.characterCount < task.minimumCharacters;
+
   async function handleSubmit() {
-    if (!field.text.trim()) return;
+    if (!field.text.trim() || belowMinimum) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -92,7 +96,16 @@ function CasualScenarioForm({
           {...field.fieldProps}
         />
         <div className="mt-1 flex justify-between text-xs text-slate-500">
-          <span>Characters: {field.characterCount}</span>
+          <span className={belowMinimum ? "text-amber-700" : ""}>
+            Characters: <strong>{field.characterCount}</strong>
+            {task.minimumCharacters > 0 && (
+              <span>
+                {" "}
+                (minimum {task.minimumCharacters}
+                {task.maximumCharacters ? `, recommended up to ${task.maximumCharacters}` : ""})
+              </span>
+            )}
+          </span>
           <span>Paste disabled — type your natural reply.</span>
         </div>
       </div>
@@ -108,9 +121,15 @@ function CasualScenarioForm({
       </label>
 
       <ErrorAlert message={error} />
+      {belowMinimum && field.text.trim() && (
+        <p className="mt-2 text-sm text-amber-700">
+          Please write at least {task.minimumCharacters} characters before continuing ({field.characterCount} so
+          far).
+        </p>
+      )}
 
       <div className="mt-6 flex justify-end">
-        <PrimaryButton onClick={handleSubmit} disabled={!field.text.trim() || submitting}>
+        <PrimaryButton onClick={handleSubmit} disabled={!field.text.trim() || belowMinimum || submitting}>
           {submitting ? "Saving…" : index + 1 < total ? "Next situation" : "Submit and continue"}
         </PrimaryButton>
       </div>

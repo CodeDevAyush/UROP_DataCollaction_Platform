@@ -108,14 +108,10 @@ export interface WritingSample {
   created_at: string;
 }
 
-export interface CasualResponse {
-  id: string;
-  participant_id: string;
-  session_id: string;
+/** One scenario reply, nested inside CasualResponse.replies. */
+export interface CasualReply {
   task_id: string;
   scenario_number: number;
-  text_category: "casual_human";
-  study_phase: string;
   raw_text: string;
   word_count: number;
   character_count: number;
@@ -131,7 +127,17 @@ export interface CasualResponse {
   independent_writing_confirmed: boolean;
   integrity_flag: IntegrityFlag;
   researcher_note: string | null;
+}
+
+/** One row per participant session — all casual scenario replies nested in `replies`. */
+export interface CasualResponse {
+  id: string;
+  participant_id: string;
+  session_id: string;
+  study_phase: string;
+  replies: CasualReply[];
   created_at: string;
+  updated_at: string;
 }
 
 export interface AiInteraction {

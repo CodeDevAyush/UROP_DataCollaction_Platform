@@ -12,7 +12,7 @@ export const GET = withApiErrorHandling(async () => {
     { count: completedSessions },
     { count: inProgressSessions },
     { count: formalSamples },
-    { count: casualSamples },
+    { data: casualRows },
     { count: aiInteractions },
     { count: aiEditedSamples },
     { data: profiles },
@@ -21,7 +21,9 @@ export const GET = withApiErrorHandling(async () => {
     supabase.from("study_sessions").select("id", { count: "exact", head: true }).eq("status", "completed"),
     supabase.from("study_sessions").select("id", { count: "exact", head: true }).eq("status", "in_progress"),
     supabase.from("writing_samples").select("id", { count: "exact", head: true }),
-    supabase.from("casual_responses").select("id", { count: "exact", head: true }),
+    // One row per participant now (replies nested inside), so "samples"
+    // means the total number of individual replies across all rows.
+    supabase.from("casual_responses").select("replies").overrideTypes<{ replies: unknown[] }[], { merge: false }>(),
     supabase.from("ai_interactions").select("id", { count: "exact", head: true }).not("ai_output", "is", null),
     supabase.from("ai_interactions").select("id", { count: "exact", head: true }).eq("was_edited", true),
     supabase
@@ -29,6 +31,8 @@ export const GET = withApiErrorHandling(async () => {
       .select("academic_year, ai_usage_frequency")
       .overrideTypes<{ academic_year: string | null; ai_usage_frequency: string | null }[], { merge: false }>(),
   ]);
+
+  const casualSamples = (casualRows ?? []).reduce((sum, row) => sum + row.replies.length, 0);
 
   const byAcademicYear: Record<string, number> = {};
   const byAiUsage: Record<string, number> = {};

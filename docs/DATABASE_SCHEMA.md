@@ -73,10 +73,19 @@ Includes writing-process metadata (`keystroke_count`, `backspace_count`,
 isn't). Unique on `(session_id, task_id)` — a task can't be submitted twice.
 
 ### `casual_responses` (Condition B — human casual)
-Same shape as `writing_samples`, one row per scenario reply. In this schema,
-each casual "task" in the `tasks` table already represents one scenario, so
-`scenario_number` mirrors presentation order rather than being a separate
-axis.
+Unlike every other data table, this is **one row per participant session**,
+not one row per submission: all of a participant's scenario replies for that
+session are nested together in a single `replies` JSONB array column
+(unique on `session_id`). Each element of that array carries the same
+fields `writing_samples` has per-row (`raw_text`, `word_count`,
+`character_count`, process metadata, `integrity_flag`,
+`independent_writing_confirmed`, `researcher_note`, plus `task_id` and
+`scenario_number` to identify which scenario it answers) — `raw_text`
+inside each element is just as immutable as every other `raw_text` column
+in this schema. Application code never queries `casual_responses` directly
+by task; see `lib/study/casual-responses.ts`, which is the only place that
+reads, appends to, or flattens this column (admin views and CSV/JSON
+exports flatten it back to one row per reply).
 
 ### `ai_interactions` (Condition C — AI-mediated)
 The most structurally important table: `student_prompt` (participant's own
@@ -113,11 +122,13 @@ carries the app-specific profile/role.
 - Never silently transform participant text (no spell-correction,
   translation, casing, emoji/slang stripping). If you add NLP processing
   later, write it to a new table.
-- `writing_samples`/`casual_responses`/`ai_interactions` each have a unique
-  constraint preventing a duplicate submission for the same
-  `(session_id, task_id)` — corrections require an explicit admin action,
-  not a silent overwrite (not yet built; see README's "Recommended next
-  steps").
+- `writing_samples`/`ai_interactions` have a unique constraint preventing a
+  duplicate submission for the same `(session_id, task_id)`;
+  `casual_responses` enforces the equivalent at the application layer
+  (`lib/study/casual-responses.ts` rejects a second reply for a `task_id`
+  already present in that session's `replies` array). Corrections require
+  an explicit admin action, not a silent overwrite (not yet built; see
+  README's "Recommended next steps").
 
 ## Known limitation: TypeScript + `@supabase/postgrest-js`
 

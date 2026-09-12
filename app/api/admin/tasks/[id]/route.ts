@@ -55,9 +55,14 @@ export const DELETE = withApiErrorHandling(async (_req: Request, ctx: { params: 
   const supabase = createSupabaseServiceClient();
 
   // Never hard-delete a task that already has submitted data — deactivate instead.
+  // casual_responses nests replies in a JSONB array, so "has this task's data"
+  // means "does any row's replies array contain an element with this task_id".
   const [{ count: formalCount }, { count: casualCount }, { count: aiCount }] = await Promise.all([
     supabase.from("writing_samples").select("id", { count: "exact", head: true }).eq("task_id", id),
-    supabase.from("casual_responses").select("id", { count: "exact", head: true }).eq("task_id", id),
+    supabase
+      .from("casual_responses")
+      .select("id", { count: "exact", head: true })
+      .contains("replies", [{ task_id: id }]),
     supabase.from("ai_interactions").select("id", { count: "exact", head: true }).eq("task_id", id),
   ]);
 

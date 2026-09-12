@@ -3,6 +3,7 @@ import { withApiErrorHandling } from "@/lib/api/response";
 import { getCurrentSession } from "@/lib/auth/participant-session";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { getSetting, SETTING_KEYS, DEFAULT_CONDITIONS_MANDATORY } from "@/lib/study/settings";
+import { getCasualResponseRow } from "@/lib/study/casual-responses";
 
 export const GET = withApiErrorHandling(async () => {
   const session = await getCurrentSession();
@@ -12,7 +13,7 @@ export const GET = withApiErrorHandling(async () => {
 
   const supabase = createSupabaseServiceClient();
 
-  const [{ data: participant }, { data: profile }, { count: formalCount }, { data: casualAssignments }, { count: casualCount }, { data: aiInteractions }] =
+  const [{ data: participant }, { data: profile }, { count: formalCount }, { data: casualAssignments }, casualRow, { data: aiInteractions }] =
     await Promise.all([
       supabase
         .from("participants")
@@ -29,7 +30,7 @@ export const GET = withApiErrorHandling(async () => {
         .select("task_id, tasks!inner(condition)")
         .eq("session_id", session.id)
         .eq("tasks.condition", "casual"),
-      supabase.from("casual_responses").select("id", { count: "exact", head: true }).eq("session_id", session.id),
+      getCasualResponseRow(session.id),
       supabase
         .from("ai_interactions")
         .select("id, ai_output, was_edited")
@@ -40,6 +41,7 @@ export const GET = withApiErrorHandling(async () => {
   const conditionsMandatory = await getSetting(SETTING_KEYS.conditionsMandatory, DEFAULT_CONDITIONS_MANDATORY);
 
   const casualTotalAssigned = casualAssignments?.length ?? 0;
+  const casualCount = casualRow?.replies.length ?? 0;
   const aiInteraction = aiInteractions?.[0] ?? null;
 
   return NextResponse.json({

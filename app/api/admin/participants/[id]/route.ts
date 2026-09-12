@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { withApiErrorHandling, jsonError } from "@/lib/api/response";
 import { requireAdmin } from "@/lib/auth/admin-auth";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
+import { flattenCasualRow, getTaskTitleLookup } from "@/lib/study/casual-responses";
+import type { CasualResponse } from "@/types/database";
 
 export const GET = withApiErrorHandling(async (_req: Request, ctx: { params: Promise<{ id: string }> }) => {
   await requireAdmin();
@@ -12,7 +14,7 @@ export const GET = withApiErrorHandling(async (_req: Request, ctx: { params: Pro
   if (error) throw error;
   if (!participant) return jsonError("Participant not found.", 404);
 
-  const [{ data: profile }, { data: sessions }, { data: formal }, { data: casual }, { data: ai }, { data: consent }] =
+  const [{ data: profile }, { data: sessions }, { data: formal }, { data: casualRows }, { data: ai }, { data: consent }, taskById] =
     await Promise.all([
       supabase.from("participant_profiles").select("*").eq("participant_id", id).maybeSingle(),
       supabase.from("study_sessions").select("*").eq("participant_id", id).order("started_at", { ascending: false }),
@@ -23,16 +25,21 @@ export const GET = withApiErrorHandling(async (_req: Request, ctx: { params: Pro
         .order("created_at", { ascending: false }),
       supabase
         .from("casual_responses")
-        .select("*, tasks(title, task_code)")
+        .select("*")
         .eq("participant_id", id)
-        .order("created_at", { ascending: false }),
+        .overrideTypes<CasualResponse[], { merge: false }>(),
       supabase
         .from("ai_interactions")
         .select("*, tasks(title, task_code)")
         .eq("participant_id", id)
         .order("created_at", { ascending: false }),
       supabase.from("consent_records").select("*").eq("participant_id", id).order("timestamp", { ascending: false }),
+      getTaskTitleLookup(),
     ]);
+
+  const casual = (casualRows ?? [])
+    .flatMap((row) => flattenCasualRow(row, taskById))
+    .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
 
   return NextResponse.json({ participant, profile, sessions, formal, casual, ai, consent });
 });

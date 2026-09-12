@@ -3,6 +3,8 @@ import { withApiErrorHandling, jsonError } from "@/lib/api/response";
 import { requireAdmin } from "@/lib/auth/admin-auth";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import { toCsv } from "@/lib/utils/csv";
+import { getTaskTitleLookup } from "@/lib/study/casual-responses";
+import type { CasualResponse } from "@/types/database";
 
 type Dataset = "participants" | "profiles" | "formal" | "casual" | "ai";
 const VALID_DATASETS: Dataset[] = ["participants", "profiles", "formal", "casual", "ai"];
@@ -114,35 +116,46 @@ async function buildRows(dataset: Dataset): Promise<Record<string, unknown>[]> {
 
   if (dataset === "casual") {
     interface Row {
+      participant_id: string;
       study_phase: string;
-      scenario_number: number;
-      raw_text: string;
-      word_count: number;
-      character_count: number;
-      duration_seconds: number | null;
-      keystroke_count: number;
-      backspace_count: number;
-      paste_attempts: number;
-      cut_attempts: number;
-      drop_attempts: number;
-      focus_loss_count: number;
-      independent_writing_confirmed: boolean;
-      integrity_flag: string;
-      submitted_at: string;
+      replies: CasualResponse["replies"];
       participants: Embedded<ParticipantRef>;
-      tasks: Embedded<TaskRef>;
     }
-    const { data } = await supabase
-      .from("casual_responses")
-      .select(
-        "study_phase, scenario_number, raw_text, word_count, character_count, duration_seconds, keystroke_count, backspace_count, paste_attempts, cut_attempts, drop_attempts, focus_loss_count, independent_writing_confirmed, integrity_flag, submitted_at, participants(participant_code), tasks(task_code, title)"
-      )
-      .overrideTypes<Row[], { merge: false }>();
-    return (data ?? []).map((row) => {
+    const [{ data }, taskById] = await Promise.all([
+      supabase
+        .from("casual_responses")
+        .select("participant_id, study_phase, replies, participants(participant_code)")
+        .overrideTypes<Row[], { merge: false }>(),
+      getTaskTitleLookup(),
+    ]);
+    // One row per scenario reply in the export, even though storage nests
+    // them together under one participant — researchers analyzing
+    // individual replies shouldn't need to know about the nesting.
+    return (data ?? []).flatMap((row) => {
       const p = unwrap(row.participants);
-      const t = unwrap(row.tasks);
-      const { participants: _p, tasks: _t, ...rest } = row;
-      return { participant_code: p?.participant_code, task_code: t?.task_code, task_title: t?.title, ...rest };
+      return row.replies.map((reply) => {
+        const t = taskById.get(reply.task_id);
+        return {
+          participant_code: p?.participant_code,
+          task_code: t?.task_code,
+          task_title: t?.title,
+          study_phase: row.study_phase,
+          scenario_number: reply.scenario_number,
+          raw_text: reply.raw_text,
+          word_count: reply.word_count,
+          character_count: reply.character_count,
+          duration_seconds: reply.duration_seconds,
+          keystroke_count: reply.keystroke_count,
+          backspace_count: reply.backspace_count,
+          paste_attempts: reply.paste_attempts,
+          cut_attempts: reply.cut_attempts,
+          drop_attempts: reply.drop_attempts,
+          focus_loss_count: reply.focus_loss_count,
+          independent_writing_confirmed: reply.independent_writing_confirmed,
+          integrity_flag: reply.integrity_flag,
+          submitted_at: reply.submitted_at,
+        };
+      });
     });
   }
 
