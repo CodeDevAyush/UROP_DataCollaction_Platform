@@ -14,7 +14,13 @@ const MAX_CODE_ATTEMPTS = 5;
 // rows (a new participant + session), so it's the main spam/abuse surface
 // on the participant side. See lib/api/rate-limit.ts for the limitation of
 // this approach on serverless hosting.
-const NEW_PARTICIPANT_LIMIT = 20;
+//
+// Sized for real classroom usage rather than generic internet traffic:
+// many participants on the same campus WiFi/NAT can share one public IP,
+// so the limit has to comfortably exceed "everyone in one room starts at
+// once" (expected cohort: 100-150 participants, up to ~50 concurrent) while
+// still catching an actual scripted-submission flood.
+const NEW_PARTICIPANT_LIMIT = 200;
 const NEW_PARTICIPANT_WINDOW_MS = 15 * 60 * 1000;
 
 export const POST = withApiErrorHandling(async (req: Request) => {
