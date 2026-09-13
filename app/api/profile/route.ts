@@ -26,5 +26,8 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   );
 
   if (error) return jsonError("Could not save profile.", 500);
+
+  await supabase.from("session_drafts").delete().eq("session_id", session.id).eq("step", "profile");
+
   return NextResponse.json({ ok: true });
 });

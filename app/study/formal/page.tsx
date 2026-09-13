@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, PrimaryButton, ErrorAlert, LoadingState, InfoAlert } from "@/components/ui";
+import { Card, PrimaryButton, SecondaryButton, ErrorAlert, LoadingState, InfoAlert } from "@/components/ui";
 import { ProtectedTextarea } from "@/components/study/ProtectedTextarea";
 import { useProtectedTextField } from "@/lib/hooks/useProtectedTextField";
 import { useAutosave, fetchDraft } from "@/lib/hooks/useAutosave";
@@ -18,7 +18,7 @@ interface FormalTask {
 
 type Attestation = "independent" | "assisted";
 
-function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void }) {
+function FormalTaskForm({ task, onDone, onBack }: { task: FormalTask; onDone: () => void; onBack: () => void }) {
   const field = useProtectedTextField({ allowClipboard: false });
   const [attestation, setAttestation] = useState<Attestation>("independent");
   const [assistedNote, setAssistedNote] = useState("");
@@ -139,7 +139,8 @@ function FormalTaskForm({ task, onDone }: { task: FormalTask; onDone: () => void
         </p>
       )}
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-between">
+        <SecondaryButton onClick={onBack}>Back</SecondaryButton>
         <PrimaryButton onClick={handleSubmit} disabled={!canSubmit || submitting}>
           {submitting ? "Submitting…" : "Submit and continue"}
         </PrimaryButton>
@@ -196,6 +197,10 @@ export default function FormalPage() {
         onDone={() => {
           if (index + 1 < tasks.length) setIndex(index + 1);
           else router.push("/study/casual");
+        }}
+        onBack={() => {
+          if (index > 0) setIndex(index - 1);
+          else router.push("/study/profile");
         }}
       />
     </Card>

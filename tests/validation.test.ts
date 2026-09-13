@@ -19,12 +19,11 @@ const validMetadata = {
 };
 
 describe("profileSchema", () => {
-  it("accepts explicit empty strings for unfilled optional fields (regression test)", () => {
-    // The profile form always sends every key, using "" for "prefer not to
-    // say" rather than omitting the key. An earlier version of this schema
-    // used `.min(1)` on these fields, which rejected "" as invalid even
-    // though the field is optional — this broke profile submission
-    // end-to-end. Guard against that regressing.
+  // Every profile question is mandatory in the UI, which blocks submission
+  // and lists exactly what's missing before this schema is ever reached.
+  // This is the server-side half of that guarantee — never trust the
+  // client alone, so an incomplete submission must fail here too.
+  it("rejects a submission with any field left blank", () => {
     const result = profileSchema.safeParse({
       academicYear: "",
       program: "",
@@ -36,14 +35,20 @@ describe("profileSchema", () => {
       aiToolsUsed: [],
       aiPrimaryUse: "",
     });
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
   });
 
-  it("still accepts filled-in values", () => {
+  it("accepts a fully filled-in profile", () => {
     const result = profileSchema.safeParse({
       academicYear: "3rd year",
+      program: "BTech",
+      branch: "CSE",
+      ageGroup: "20–22",
       primaryLanguage: "Tamil",
       otherLanguages: ["English", "Hindi"],
+      aiUsageFrequency: "Daily",
+      aiToolsUsed: ["ChatGPT"],
+      aiPrimaryUse: "Assignments",
     });
     expect(result.success).toBe(true);
   });

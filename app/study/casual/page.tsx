@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, PrimaryButton, ErrorAlert, LoadingState } from "@/components/ui";
+import { Card, PrimaryButton, SecondaryButton, ErrorAlert, LoadingState } from "@/components/ui";
 import { useProtectedTextField } from "@/lib/hooks/useProtectedTextField";
 import { useAutosave, fetchDraft } from "@/lib/hooks/useAutosave";
 
@@ -19,11 +19,13 @@ function CasualScenarioForm({
   index,
   total,
   onDone,
+  onBack,
 }: {
   task: CasualTask;
   index: number;
   total: number;
   onDone: () => void;
+  onBack: () => void;
 }) {
   const field = useProtectedTextField({ allowClipboard: false });
   const [independent, setIndependent] = useState(true);
@@ -128,7 +130,8 @@ function CasualScenarioForm({
         </p>
       )}
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-between">
+        <SecondaryButton onClick={onBack}>Back</SecondaryButton>
         <PrimaryButton onClick={handleSubmit} disabled={!field.text.trim() || belowMinimum || submitting}>
           {submitting ? "Saving…" : index + 1 < total ? "Next situation" : "Submit and continue"}
         </PrimaryButton>
@@ -187,6 +190,10 @@ export default function CasualPage() {
         onDone={() => {
           if (index + 1 < tasks.length) setIndex(index + 1);
           else router.push("/study/ai");
+        }}
+        onBack={() => {
+          if (index > 0) setIndex(index - 1);
+          else router.push("/study/formal");
         }}
       />
     </Card>

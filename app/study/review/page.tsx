@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, PrimaryButton, ErrorAlert, LoadingState } from "@/components/ui";
+import { Card, PrimaryButton, SecondaryButton, ErrorAlert, LoadingState } from "@/components/ui";
 
 interface SessionStatus {
   started: boolean;
@@ -111,7 +111,8 @@ export default function ReviewPage() {
 
       <ErrorAlert message={error} />
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex justify-between">
+        <SecondaryButton onClick={() => router.push("/study/ai")}>Back</SecondaryButton>
         <PrimaryButton onClick={handleFinish} disabled={!allRequiredDone || submitting}>
           {submitting ? "Finishing…" : "Finish the study"}
         </PrimaryButton>

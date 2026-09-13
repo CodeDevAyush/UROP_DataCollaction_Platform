@@ -29,7 +29,17 @@ const TOOL_URLS: Record<string, string> = {
 
 type Stage = "prompt" | "handoff" | "output";
 
-function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfig; onDone: () => void }) {
+function AiTaskFlow({
+  task,
+  config,
+  onDone,
+  onBack,
+}: {
+  task: AiTask;
+  config: StudyConfig;
+  onDone: () => void;
+  onBack: () => void;
+}) {
   const promptField = useProtectedTextField({ allowClipboard: false });
   const [aiTool, setAiTool] = useState(config.aiToolOptions[0] ?? "ChatGPT");
   const [aiMode, setAiMode] = useState<"controlled" | "natural">(config.aiDefaultMode);
@@ -184,7 +194,8 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
           </p>
         )}
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-between">
+          <SecondaryButton onClick={onBack}>Back</SecondaryButton>
           <PrimaryButton onClick={submitPrompt} disabled={belowMinimum || submitting}>
             {submitting ? "Saving…" : "Record my prompt"}
           </PrimaryButton>
@@ -221,7 +232,8 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
           )}
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-between">
+          <SecondaryButton onClick={() => setStage("prompt")}>Back</SecondaryButton>
           <PrimaryButton onClick={() => setStage("output")}>I have the AI&apos;s response</PrimaryButton>
         </div>
       </>
@@ -286,7 +298,8 @@ function AiTaskFlow({ task, config, onDone }: { task: AiTask; config: StudyConfi
 
       <ErrorAlert message={error} />
 
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-between">
+        <SecondaryButton onClick={() => setStage("handoff")}>Back</SecondaryButton>
         <PrimaryButton
           onClick={submitOutput}
           disabled={submitting || !outputField.text.trim() || (wasEdited === "yes" && !editedField.text.trim())}
@@ -353,6 +366,10 @@ export default function AiTaskPage() {
         onDone={() => {
           if (index + 1 < tasks.length) setIndex(index + 1);
           else router.push("/study/review");
+        }}
+        onBack={() => {
+          if (index > 0) setIndex(index - 1);
+          else router.push("/study/casual");
         }}
       />
     </Card>

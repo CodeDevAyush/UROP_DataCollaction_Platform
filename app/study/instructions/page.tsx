@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Card, PrimaryButton } from "@/components/ui";
+import { Card, PrimaryButton, SecondaryButton } from "@/components/ui";
 
 export default function InstructionsPage() {
   return (
@@ -44,7 +44,10 @@ export default function InstructionsPage() {
         </p>
       </div>
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex justify-between">
+        <Link href="/">
+          <SecondaryButton>Back</SecondaryButton>
+        </Link>
         <Link href="/study/consent">
           <PrimaryButton>Continue to consent</PrimaryButton>
         </Link>

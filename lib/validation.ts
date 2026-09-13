@@ -22,19 +22,22 @@ export const consentSchema = z.object({
   consentVersion: z.string().min(1),
 });
 
-// Free-text/select fields are optional and the form always sends a string
-// (possibly ""), never omits the key — so these must accept "" rather than
-// require min(1), which would (and did) reject an intentionally blank field.
+// All profile questions are mandatory in the UI (the client blocks
+// submission and shows exactly which fields are missing before this is
+// ever called) — required here too as defense-in-depth, never trusting the
+// client alone. academicYear/ageGroup/aiUsageFrequency are <select>s that
+// always carry a real default value, so min(1) on them is just a guard
+// against a malformed request, not something a participant can trigger.
 export const profileSchema = z.object({
-  academicYear: z.string().max(100).optional().default(""),
-  program: z.string().max(200).optional().default(""),
-  branch: z.string().max(200).optional().default(""),
-  ageGroup: z.string().max(50).optional().default(""),
-  primaryLanguage: z.string().max(100).optional().default(""),
-  otherLanguages: z.array(z.string().max(100)).max(10).optional().default([]),
-  aiUsageFrequency: z.string().max(100).optional().default(""),
-  aiToolsUsed: z.array(z.string().max(100)).max(10).optional().default([]),
-  aiPrimaryUse: z.string().max(300).optional().default(""),
+  academicYear: z.string().min(1).max(100),
+  program: z.string().min(1).max(200),
+  branch: z.string().min(1).max(200),
+  ageGroup: z.string().min(1).max(50),
+  primaryLanguage: z.string().min(1).max(100),
+  otherLanguages: z.array(z.string().max(100)).min(1).max(10),
+  aiUsageFrequency: z.string().min(1).max(100),
+  aiToolsUsed: z.array(z.string().max(100)).min(1).max(10),
+  aiPrimaryUse: z.string().min(1).max(300),
 });
 
 export const attestationSchema = z.discriminatedUnion("type", [

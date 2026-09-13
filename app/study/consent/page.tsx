@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, PrimaryButton, ErrorAlert, LoadingState } from "@/components/ui";
+import { Card, PrimaryButton, SecondaryButton, ErrorAlert, LoadingState } from "@/components/ui";
 
 interface StudyConfig {
   consentText: string;
@@ -103,7 +103,8 @@ export default function ConsentPage() {
 
       <ErrorAlert message={error} />
 
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex justify-between">
+        <SecondaryButton onClick={() => router.push("/study/instructions")}>Back</SecondaryButton>
         <PrimaryButton onClick={handleSubmit} disabled={!allChecked || submitting}>
           {submitting ? "Submitting…" : "I agree — continue"}
         </PrimaryButton>
