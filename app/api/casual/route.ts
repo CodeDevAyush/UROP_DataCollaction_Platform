@@ -19,9 +19,10 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   }
 
   const metrics = computeTextMetrics(body.text);
-  if (metrics.characterCount < task.minimum_characters) {
+  const minWords = task.minimum_words ?? (task.minimum_characters && task.minimum_characters <= 50 ? task.minimum_characters : 50);
+  if (metrics.wordCount < minWords) {
     return jsonError(
-      `Reply must be at least ${task.minimum_characters} characters (currently ${metrics.characterCount}).`,
+      `Reply must be at least ${minWords} words (currently ${metrics.wordCount}).`,
       422
     );
   }

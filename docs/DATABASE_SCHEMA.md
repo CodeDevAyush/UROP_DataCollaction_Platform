@@ -49,8 +49,8 @@ One attempt at the study flow. `status` is `in_progress` | `completed` |
 
 ### `tasks`
 The researcher-managed question bank. One row per stimulus (`condition` is
-`formal` | `casual` | `ai`). `minimum_characters`/`maximum_characters` and
-`minimum_duration_seconds`/`maximum_duration_seconds` are enforced (character
+`formal` | `casual` | `ai`). `minimum_words`/`maximum_words` and
+`minimum_duration_seconds`/`maximum_duration_seconds` are enforced (word
 count server-side; duration is currently informational/display-only) per
 task. `active` toggles visibility without deleting history.
 

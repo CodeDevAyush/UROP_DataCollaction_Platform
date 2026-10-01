@@ -13,8 +13,11 @@ interface ProtectedTextareaProps {
   label: string;
   placeholder?: string;
   fieldProps: React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-  characterCount: number;
+  wordCount?: number;
+  characterCount?: number;
   elapsedSeconds: number;
+  minimumWords?: number;
+  maximumWords?: number;
   minimumCharacters?: number;
   maximumCharacters?: number;
   rows?: number;
@@ -26,14 +29,23 @@ export function ProtectedTextarea({
   label,
   placeholder,
   fieldProps,
+  wordCount,
   characterCount,
   elapsedSeconds,
+  minimumWords,
+  maximumWords,
   minimumCharacters,
   maximumCharacters,
   rows = 10,
   allowClipboard = false,
 }: ProtectedTextareaProps) {
-  const belowMinimum = typeof minimumCharacters === "number" && characterCount < minimumCharacters;
+  const effectiveMinWords = typeof minimumWords === "number" ? minimumWords : undefined;
+  const effectiveMaxWords = typeof maximumWords === "number" ? maximumWords : undefined;
+  const useWords = typeof effectiveMinWords === "number" || typeof wordCount === "number";
+  const currentCount = useWords ? (wordCount ?? 0) : (characterCount ?? 0);
+  const minCount = useWords ? effectiveMinWords : minimumCharacters;
+  const maxCount = useWords ? effectiveMaxWords : maximumCharacters;
+  const belowMinimum = typeof minCount === "number" && currentCount < minCount;
 
   return (
     <div className="space-y-2">
@@ -50,13 +62,13 @@ export function ProtectedTextarea({
       />
       <div id={`${id}-counters`} className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
         <span aria-live="polite">
-          Character count:{" "}
-          <strong className={belowMinimum ? "text-amber-700" : "text-slate-700"}>{characterCount}</strong>
-          {typeof minimumCharacters === "number" && minimumCharacters > 0 && (
+          {useWords ? "Word count: " : "Character count: "}
+          <strong className={belowMinimum ? "text-amber-700" : "text-slate-700"}>{currentCount}</strong>
+          {typeof minCount === "number" && minCount > 0 && (
             <span>
               {" "}
-              (minimum {minimumCharacters}
-              {maximumCharacters ? `, recommended up to ${maximumCharacters}` : ""})
+              (minimum {minCount}
+              {maxCount ? `, recommended up to ${maxCount}` : ""})
             </span>
           )}
         </span>

@@ -21,9 +21,10 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   }
 
   const metrics = computeTextMetrics(body.studentPrompt);
-  if (metrics.characterCount < task.minimum_characters) {
+  const minWords = task.minimum_words ?? (task.minimum_characters && task.minimum_characters <= 300 ? task.minimum_characters : 300);
+  if (metrics.wordCount < minWords) {
     return jsonError(
-      `Your instructions must be at least ${task.minimum_characters} characters (currently ${metrics.characterCount}).`,
+      `Your instructions must be at least ${minWords} words (currently ${metrics.wordCount}).`,
       422
     );
   }

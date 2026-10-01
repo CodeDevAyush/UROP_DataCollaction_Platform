@@ -12,8 +12,10 @@ interface FormalTask {
   title: string;
   scenario: string;
   instructions: string;
-  minimumCharacters: number;
-  maximumCharacters: number | null;
+  minimumWords?: number;
+  maximumWords?: number | null;
+  minimumCharacters?: number;
+  maximumCharacters?: number | null;
 }
 
 type Attestation = "independent" | "assisted";
@@ -39,7 +41,8 @@ function FormalTaskForm({ task, onDone, onBack }: { task: FormalTask; onDone: ()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const belowMinimum = field.characterCount < task.minimumCharacters;
+  const minWords = task.minimumWords ?? (task.minimumCharacters && task.minimumCharacters < 1000 ? task.minimumCharacters : 500);
+  const belowMinimum = field.wordCount < minWords;
   const canSubmit = !belowMinimum && (attestation === "independent" || assistedNote.trim().length > 0);
 
   async function handleSubmit() {
@@ -83,10 +86,11 @@ function FormalTaskForm({ task, onDone, onBack }: { task: FormalTask; onDone: ()
           id="formal-response"
           label="Your response"
           fieldProps={field.fieldProps}
+          wordCount={field.wordCount}
           characterCount={field.characterCount}
           elapsedSeconds={field.elapsedSeconds}
-          minimumCharacters={task.minimumCharacters}
-          maximumCharacters={task.maximumCharacters ?? undefined}
+          minimumWords={minWords}
+          maximumWords={task.maximumWords ?? undefined}
           rows={14}
         />
       </div>
@@ -134,8 +138,7 @@ function FormalTaskForm({ task, onDone, onBack }: { task: FormalTask; onDone: ()
       <ErrorAlert message={error} />
       {belowMinimum && (
         <p className="mt-2 text-sm text-amber-700">
-          Please write at least {task.minimumCharacters} characters before continuing ({field.characterCount} so
-          far).
+          Please write at least {minWords} words before continuing ({field.wordCount} so far).
         </p>
       )}
 

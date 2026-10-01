@@ -12,8 +12,10 @@ interface AiTask {
   title: string;
   scenario: string;
   instructions: string;
-  minimumCharacters: number;
-  maximumCharacters: number | null;
+  minimumWords?: number;
+  maximumWords?: number | null;
+  minimumCharacters?: number;
+  maximumCharacters?: number | null;
 }
 
 interface StudyConfig {
@@ -66,7 +68,8 @@ function AiTaskFlow({
   const editedField = useProtectedTextField({ allowClipboard: true });
   const [modelName, setModelName] = useState("");
 
-  const belowMinimum = promptField.characterCount < task.minimumCharacters;
+  const minWords = task.minimumWords ?? (task.minimumCharacters && task.minimumCharacters <= 300 ? task.minimumCharacters : 300);
+  const belowMinimum = promptField.wordCount < minWords;
 
   async function submitPrompt() {
     setSubmitting(true);
@@ -179,10 +182,11 @@ function AiTaskFlow({
             id="ai-prompt"
             label="Your instructions to the AI"
             fieldProps={promptField.fieldProps}
+            wordCount={promptField.wordCount}
             characterCount={promptField.characterCount}
             elapsedSeconds={promptField.elapsedSeconds}
-            minimumCharacters={task.minimumCharacters}
-            maximumCharacters={task.maximumCharacters ?? undefined}
+            minimumWords={minWords}
+            maximumWords={task.maximumWords ?? undefined}
             rows={8}
           />
         </div>
@@ -190,7 +194,7 @@ function AiTaskFlow({
         <ErrorAlert message={error} />
         {belowMinimum && (
           <p className="mt-2 text-sm text-amber-700">
-            Write at least {task.minimumCharacters} characters ({promptField.characterCount} so far).
+            Write at least {minWords} words ({promptField.wordCount} so far).
           </p>
         )}
 

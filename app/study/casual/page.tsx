@@ -10,8 +10,10 @@ interface CasualTask {
   id: string;
   title: string;
   scenario: string;
-  minimumCharacters: number;
-  maximumCharacters: number | null;
+  minimumWords?: number;
+  maximumWords?: number | null;
+  minimumCharacters?: number;
+  maximumCharacters?: number | null;
 }
 
 function CasualScenarioForm({
@@ -45,7 +47,8 @@ function CasualScenarioForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const belowMinimum = field.characterCount < task.minimumCharacters;
+  const minWords = task.minimumWords ?? (task.minimumCharacters && task.minimumCharacters <= 50 ? task.minimumCharacters : 50);
+  const belowMinimum = field.wordCount < minWords;
 
   async function handleSubmit() {
     if (!field.text.trim() || belowMinimum) return;
@@ -99,12 +102,12 @@ function CasualScenarioForm({
         />
         <div className="mt-1 flex justify-between text-xs text-slate-500">
           <span className={belowMinimum ? "text-amber-700" : ""}>
-            Characters: <strong>{field.characterCount}</strong>
-            {task.minimumCharacters > 0 && (
+            Words: <strong>{field.wordCount}</strong>
+            {minWords > 0 && (
               <span>
                 {" "}
-                (minimum {task.minimumCharacters}
-                {task.maximumCharacters ? `, recommended up to ${task.maximumCharacters}` : ""})
+                (minimum {minWords}
+                {task.maximumWords ? `, recommended up to ${task.maximumWords}` : ""})
               </span>
             )}
           </span>
@@ -125,7 +128,7 @@ function CasualScenarioForm({
       <ErrorAlert message={error} />
       {belowMinimum && field.text.trim() && (
         <p className="mt-2 text-sm text-amber-700">
-          Please write at least {task.minimumCharacters} characters before continuing ({field.characterCount} so
+          Please write at least {minWords} words before continuing ({field.wordCount} so
           far).
         </p>
       )}

@@ -23,16 +23,23 @@ export const GET = withApiErrorHandling(async (_req: Request, ctx: { params: Pro
   }
 
   return NextResponse.json({
-    tasks: tasks.map((t) => ({
-      id: t.id,
-      taskCode: t.task_code,
-      title: t.title,
-      scenario: t.scenario,
-      instructions: t.instructions,
-      minimumCharacters: t.minimum_characters,
-      maximumCharacters: t.maximum_characters,
-      minimumDurationSeconds: t.minimum_duration_seconds,
-      maximumDurationSeconds: t.maximum_duration_seconds,
-    })),
+    tasks: tasks.map((t) => {
+      const defaultMinWords = condition === "formal" ? 500 : condition === "casual" ? 50 : 300;
+      const minWords = t.minimum_words ?? t.minimum_characters ?? defaultMinWords;
+      const maxWords = t.maximum_words ?? t.maximum_characters ?? null;
+      return {
+        id: t.id,
+        taskCode: t.task_code,
+        title: t.title,
+        scenario: t.scenario,
+        instructions: t.instructions,
+        minimumWords: minWords,
+        maximumWords: maxWords,
+        minimumCharacters: t.minimum_characters ?? minWords,
+        maximumCharacters: t.maximum_characters ?? maxWords,
+        minimumDurationSeconds: t.minimum_duration_seconds,
+        maximumDurationSeconds: t.maximum_duration_seconds,
+      };
+    }),
   });
 });

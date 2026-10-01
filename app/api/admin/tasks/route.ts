@@ -12,7 +12,9 @@ const taskSchema = z.object({
   title: z.string().min(1).max(300),
   scenario: z.string().min(1).max(10000),
   instructions: z.string().max(5000).default(""),
-  minimumCharacters: z.number().int().min(0).default(0),
+  minimumWords: z.number().int().min(0).optional(),
+  maximumWords: z.number().int().min(0).nullable().optional(),
+  minimumCharacters: z.number().int().min(0).optional(),
   maximumCharacters: z.number().int().min(0).nullable().optional(),
   minimumDurationSeconds: z.number().int().min(0).nullable().optional(),
   maximumDurationSeconds: z.number().int().min(0).nullable().optional(),
@@ -40,6 +42,9 @@ export const POST = withApiErrorHandling(async (req: Request) => {
   const body = taskSchema.parse(await req.json());
   const supabase = createSupabaseServiceClient();
 
+  const minWords = body.minimumWords ?? body.minimumCharacters ?? 0;
+  const maxWords = body.maximumWords ?? body.maximumCharacters ?? null;
+
   const { data, error } = await supabase
     .from("tasks")
     .insert({
@@ -49,8 +54,10 @@ export const POST = withApiErrorHandling(async (req: Request) => {
       title: body.title,
       scenario: body.scenario,
       instructions: body.instructions,
-      minimum_characters: body.minimumCharacters,
-      maximum_characters: body.maximumCharacters ?? null,
+      minimum_words: minWords,
+      maximum_words: maxWords,
+      minimum_characters: minWords,
+      maximum_characters: maxWords,
       minimum_duration_seconds: body.minimumDurationSeconds ?? null,
       maximum_duration_seconds: body.maximumDurationSeconds ?? null,
       randomization_group: body.randomizationGroup ?? null,
