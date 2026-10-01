@@ -12,7 +12,7 @@ export default function LandingPage() {
 
         <div className="mt-8 space-y-4 text-slate-700">
           <p>
-            This is an academic research study (UROP project). If you take part, you will be asked to provide a
+            This is an academic research case study. If you take part, you will be asked to provide a
             few short writing samples: a formal/academic response, some casual message replies, and a task where
             you write your own instructions for a generative-AI tool and then paste back its response.
           </p>

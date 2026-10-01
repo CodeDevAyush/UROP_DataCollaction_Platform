@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { createSupabaseServiceClient } from "@/lib/supabase/server";
 import type { StudySession } from "@/types/database";
 
-const SESSION_COOKIE = "urop_session_id";
+const SESSION_COOKIE = "study_session_id";
 
 export async function setSessionCookie(sessionId: string) {
   const cookieStore = await cookies();
@@ -19,6 +19,7 @@ export async function setSessionCookie(sessionId: string) {
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);
+  cookieStore.delete("urop_session_id");
 }
 
 /**
@@ -29,7 +30,7 @@ export async function clearSessionCookie() {
  */
 export async function getCurrentSession(): Promise<StudySession | null> {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
+  const sessionId = cookieStore.get(SESSION_COOKIE)?.value ?? cookieStore.get("urop_session_id")?.value;
   if (!sessionId) return null;
 
   const supabase = createSupabaseServiceClient();

@@ -33,7 +33,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
     <div className="flex min-h-screen bg-slate-50">
       <aside className="hidden w-56 flex-shrink-0 border-r border-slate-200 bg-white sm:block">
         <div className="p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">UROP Study</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Case Study</p>
           <p className="text-sm font-semibold text-slate-900">Researcher Console</p>
         </div>
         <nav className="mt-2 flex flex-col gap-1 px-2">

@@ -51,7 +51,7 @@ export default function ReviewPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not finish the study.");
       if (typeof window !== "undefined" && data.participantCode) {
-        sessionStorage.setItem("urop_participant_code", data.participantCode);
+        sessionStorage.setItem("case_study_participant_code", data.participantCode);
       }
       router.push("/study/completion");
     } catch (err) {

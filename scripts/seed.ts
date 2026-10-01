@@ -183,7 +183,7 @@ const defaultSettings: Record<string, unknown> = {
   current_study_phase: STUDY_PHASE,
   researcher_contact: "researcher@example.edu (replace in Admin > Settings)",
   faculty_mentor_contact: "faculty.mentor@example.edu (replace in Admin > Settings)",
-  retention_policy: "Anonymized research data is retained for the duration of the UROP project and any resulting publication, per departmental guidelines. (Replace with your approved retention policy.)",
+  retention_policy: "Anonymized research data is retained for the duration of the case study and any resulting publication, per departmental guidelines. (Replace with your approved retention policy.)",
 };
 
 async function main() {

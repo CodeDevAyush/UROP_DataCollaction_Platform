@@ -9,7 +9,7 @@ Study title: AI-Tool Influence on Code-Switching Patterns Among SRM Students:
 An NLP-Based Register and Code-Mixing Analysis
 
 Purpose
-This is an academic (UROP) research study investigating how students write in
+This is an academic case study investigating how students write in
 formal/academic contexts, how they communicate casually, how they prompt
 generative-AI tools, and how AI-generated text compares with a student's own
 natural writing style.
@@ -50,7 +50,7 @@ reported only in de-identified/aggregate form.
 
 Research use
 Your anonymized responses may be used for academic analysis, publication,
-or presentation related to this UROP project.
+or presentation related to this case study.
 
 Contact
 Questions about this study can be directed to the student researcher and

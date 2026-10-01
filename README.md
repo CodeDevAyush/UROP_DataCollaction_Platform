@@ -1,6 +1,6 @@
-# UROP Language Study Platform
+# Case Study Language Platform
 
-A research data-collection platform for the UROP project:
+A research data-collection platform for the case study:
 
 > **AI-Tool Influence on Code-Switching Patterns Among SRM Students: An
 > NLP-Based Register and Code-Mixing Analysis**
@@ -40,7 +40,7 @@ backend server, CORS setup, or second deploy pipeline to maintain). Within
 that one app, the three layers are still cleanly separated by folder:
 
 ```
-UROP/
+case-study/
 ├── app/                    # FRONTEND — pages, layouts, and only the API
 │   ├── study/              #   route handlers Next.js requires to live
 │   ├── admin/              #   alongside pages (app/api/**). Each route.ts

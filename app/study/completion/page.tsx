@@ -5,7 +5,9 @@ import { Card } from "@/components/ui";
 
 export default function CompletionPage() {
   const [code] = useState<string | null>(() =>
-    typeof window !== "undefined" ? sessionStorage.getItem("urop_participant_code") : null
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("case_study_participant_code") ?? sessionStorage.getItem("urop_participant_code")
+      : null
   );
 
   return (

@@ -1,5 +1,5 @@
 -- ============================================================================
--- UROP Language Study — Initial Schema
+-- Case Study — Initial Schema
 -- Research data-collection platform for:
 -- "AI-Tool Influence on Code-Switching Patterns Among SRM Students"
 --

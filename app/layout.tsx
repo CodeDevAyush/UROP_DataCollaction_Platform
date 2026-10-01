@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AI-Tool Influence on Code-Switching — SRM Research Study",
   description:
-    "Academic research data-collection platform for the UROP study on AI-tool influence on code-switching patterns among SRM students.",
+    "Academic research data-collection platform for the case study on AI-tool influence on code-switching patterns among SRM students.",
   // A study recruitment tool and admin login should never show up in search
   // results — the HTTP-level X-Robots-Tag header (next.config.ts) covers
   // every response including API routes; this covers crawlers that only
